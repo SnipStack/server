@@ -9,3 +9,66 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+enum Languages {
+  JAVASCRIPT
+  TYPESCRIPT
+  PYTHON
+  JAVA
+  C
+  CPP
+  RUBY
+  GO
+  RUST
+  KOTLIN
+  SWIFT
+  SCALA
+  CSHARP
+  PHP
+  HTML
+  CSS
+  SQL
+  SHELL
+  OTHER
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email    String   @unique
+  username String
+  avatarUrl String?
+  githubId String  @unique
+  oauth    Oauth?
+  oauthId  Int? @unique
+  snippets Snippet[]
+}
+
+model Category {
+  id        Int      @id @default(autoincrement())
+  name      String
+  snippets Snippet[]
+}
+
+model Snippet {
+  id          Int      @id @default(autoincrement())
+  title       String
+  content     String
+  description String
+  upvotes     Int      @default(0)
+  downvotes   Int      @default(0)
+  language    Languages
+  category    Category @relation(fields: [categoryId], references: [id])
+  categoryId  Int
+  user        User     @relation(fields: [userId], references: [githubId])
+  userId      String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Oauth {
+  id     Int    @id @default(autoincrement())
+  userId Int @unique
+  user   User   @relation(fields: [userId], references: [id])
+  refreshToken String?
+  accessToken String
+}
